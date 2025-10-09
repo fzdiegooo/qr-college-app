@@ -1,69 +1,68 @@
-// Types for Database Tables
-
-export interface Rol {
-  id: number;
-  nombre: string;
-  created_at?: string;
-  updated_at?: string;
+export interface Grado {
+  id: number
+  nombre: string
 }
 
-export interface Grado {
-  id: number;
-  nombre: string;
-  created_at?: string;
-  updated_at?: string;
+export interface Rol {
+  id: number
+  nombre: string
 }
 
 export interface Seccion {
-  id: number;
-  nombre: string;
-  created_at?: string;
-  updated_at?: string;
+  id: number
+  nombre: string
 }
 
 export interface Usuario {
-  id: string; // UUID
-  nombre: string;
-  documento: string;
-  sexo: 'M' | 'F';
-  edad: number;
-  gradoId: number;
-  seccionId: number;
-  RolId: number;
-  grado?: Grado;
-  seccion?: Seccion;
-  rol?: Rol;
-  created_at?: string;
-  updated_at?: string;
+  id: string
+  nombre: string
+  documento: string
+  sexo: 'M' | 'F'
+  edad: number
+  gradoId?: number | null
+  seccionId?: number | null
+  rolId?: number | null
+  grado?: Grado
+  seccion?: Seccion
+  rol?: Rol
 }
 
-// Alias para mantener compatibilidad
-export type Alumno = Usuario;
+export type EstadoAsistencia = 'ASISTENCIA' | 'TARDANZA' | 'FALTA'
 
-// Database Schema Type
-export interface Database {
-  public: {
-    Tables: {
-      rol: {
-        Row: Rol;
-        Insert: Omit<Rol, 'created_at' | 'updated_at'>;
-        Update: Partial<Omit<Rol, 'id' | 'created_at' | 'updated_at'>>;
-      };
-      grado: {
-        Row: Grado;
-        Insert: Omit<Grado, 'created_at' | 'updated_at'>;
-        Update: Partial<Omit<Grado, 'id' | 'created_at' | 'updated_at'>>;
-      };
-      seccion: {
-        Row: Seccion;
-        Insert: Omit<Seccion, 'created_at' | 'updated_at'>;
-        Update: Partial<Omit<Seccion, 'id' | 'created_at' | 'updated_at'>>;
-      };
-      usuarios: {
-        Row: Usuario;
-        Insert: Omit<Usuario, 'created_at' | 'updated_at' | 'grado' | 'seccion' | 'rol'>;
-        Update: Partial<Omit<Usuario, 'id' | 'created_at' | 'updated_at' | 'grado' | 'seccion' | 'rol'>>;
-      };
-    };
-  };
+export interface Asistencia {
+  id: number
+  usuarioId: string
+  fecha: string // ISO date
+  hora_llegada?: string | null // HH:mm:ss
+  hora_salida?: string | null
+  estado: EstadoAsistencia
+  usuarios?: Usuario
+}
+
+export interface InfoContacto {
+  id: number
+  usuarioId: string
+  correo?: string | null
+  telefono?: string | null
+  usuario?: Usuario
+}
+
+export interface Configuracion {
+  id: number
+  hora_entrada: string
+  hora_salida: string
+  hora_falta: string | null
+  tolerancia_minutos: number
+  fecha_creacion: string
+}
+
+export interface PaginationParams {
+  page?: number
+  limit?: number
+  filters?: Record<string, any>
+}
+
+export interface PaginatedResponse<T> {
+  data: T[]
+  count: number
 }

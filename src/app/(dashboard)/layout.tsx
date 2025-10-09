@@ -11,27 +11,29 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       <Sidebar />
 
       {/* Main Content */}
-      <div 
-        className={`flex-1 flex flex-col transition-all duration-300 ${
-          isSidebarOpen ? "ml-64" : "ml-0"
-        }`}
-      >
+      <div className="flex-1 flex flex-col w-full transition-all duration-300">
         {/* Header */}
-        <header className="bg-white shadow-md">
-          <div className={`px-8 py-4 transition-all duration-300 ${
-            isSidebarOpen ? "ml-0" : "ml-16"
-          }`}>
+        <header className="bg-white shadow-md relative z-20">
+          <div className="px-4 md:px-8 py-3 md:py-4">
             <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-800">Sistema de Gestión Escolar</h1>
-                <p className="text-sm text-gray-500 mt-1">I.E. 3082 &quot;Paraíso Florida&quot;</p>
+              <div className="flex-1 min-w-0">
+                {/* En móvil agregar margen para el botón toggle, en desktop no */}
+                <div className="ml-12 md:ml-0">
+                  <h1 className="text-lg md:text-2xl font-bold text-gray-800 truncate">
+                    <span className="hidden sm:inline">Sistema de Gestión Escolar</span>
+                    <span className="sm:hidden">SGE</span>
+                  </h1>
+                  <p className="text-xs md:text-sm text-gray-500 mt-1 truncate">
+                    I.E. 3082 &quot;Paraíso Florida&quot;
+                  </p>
+                </div>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="text-right">
-                  <p className="text-sm font-medium text-gray-700">Administrador</p>
+              <div className="flex items-center gap-2 md:gap-4 ml-4">
+                <div className="text-right hidden sm:block">
+                  <p className="text-xs md:text-sm font-medium text-gray-700">Administrador</p>
                   <p className="text-xs text-gray-500">UGEL 02</p>
                 </div>
-                <div className="w-10 h-10 bg-gradient-to-br from-[#8B1A1A] to-[#3B82F6] rounded-full flex items-center justify-center text-white font-bold">
+                <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-[#8B1A1A] to-[#3B82F6] rounded-full flex items-center justify-center text-white font-bold text-sm md:text-base">
                   A
                 </div>
               </div>
@@ -40,10 +42,8 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Main Content Area */}
-        <main className={`flex-1 overflow-auto p-8 transition-all duration-300 ${
-          isSidebarOpen ? "ml-0" : "ml-16"
-        }`}>
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-1 overflow-auto p-3 md:p-8 relative z-10">
+          <div className="max-w-7xl mx-auto w-full">
             {children}
           </div>
         </main>
