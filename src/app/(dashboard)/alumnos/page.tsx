@@ -4,6 +4,7 @@ import { getSecciones } from "@/services/seccionService";
 import { Usuario, Grado, Seccion } from "@/types/database.types";
 import { usuarioService } from "@/services/alumnosService";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   FaSearch,
   FaPlus,
@@ -15,6 +16,7 @@ import {
 } from "react-icons/fa";
 
 export default function AlumnosPage() {
+  const router = useRouter();
   const [alumnos, setAlumnos] = useState<Usuario[]>([]);
   const [grados, setGrados] = useState<Grado[]>([]);
   const [secciones, setSecciones] = useState<Seccion[]>([]);
@@ -318,6 +320,7 @@ export default function AlumnosPage() {
                     </div>
                     <div className="flex gap-1 ml-2">
                       <button
+                        onClick={() => router.push(`/alumnos/${alumno.id}`)}
                         className="p-2 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
                         title="Ver"
                       >
@@ -437,6 +440,7 @@ export default function AlumnosPage() {
                       <td className="px-4 py-3">
                         <div className="flex justify-center gap-1">
                           <button
+                            onClick={() => router.push(`/alumnos/${alumno.id}`)}
                             className="p-1.5 rounded-md text-blue-600 hover:bg-blue-50 transition-colors"
                             title="Ver"
                           >

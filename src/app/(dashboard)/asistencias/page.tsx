@@ -185,18 +185,42 @@ export default function AsistenciasPage() {
     setResult(null);
     setError(null);
     setLoading(true);
-    
+
     try {
       // Se espera que el QR contenga el id del usuario
       const usuarioId = decodedText.trim();
+      // Registrar asistencia
       const res = await fetch("/api/asistencia", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ usuarioId }),
       });
       const data = await res.json();
+
+      // Si la asistencia se registró correctamente, buscar datos y enviar correo
       if (res.ok) {
         setResult(data.message || "Asistencia registrada");
+
+        // Obtener datos del usuario y contacto
+        const usuarioRes = await fetch(`/api/usuario/${usuarioId}`);
+        const usuario = await usuarioRes.json();
+        const contactoRes = await fetch(`/api/info-contacto/${usuarioId}`);
+        const contacto = await contactoRes.json();
+
+        // Enviar correo al microservicio con el tipo correcto
+        await fetch("http://localhost:3100/api/send-school-attendance", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            to: contacto.correo,
+            templateId: 1,
+            parentName: contacto.nombre,
+            studentName: usuario.nombre,
+            grade: usuario.grado?.nombre || usuario.gradoNombre || "",
+            section: usuario.seccion?.nombre || usuario.seccionNombre || "",
+            actionType: data.actionType || "entrada"
+          })
+        });
       } else {
         setError(data.error || "Error al registrar asistencia");
       }
@@ -204,12 +228,12 @@ export default function AsistenciasPage() {
       setError("Error de red o inesperado");
     } finally {
       setLoading(false);
-      
+
       // Limpiar timeout anterior si existe
       if (autoRestartTimeout.current) {
         clearTimeout(autoRestartTimeout.current);
       }
-      
+
       // Reactivar escáner automáticamente después de 3s
       autoRestartTimeout.current = setTimeout(() => {
         setResult(null);

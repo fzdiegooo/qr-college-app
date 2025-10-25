@@ -47,7 +47,7 @@ export default async function DashboardPage() {
       {/* Welcome Section */}
       <div className="bg-gradient-to-r from-[#8B1A1A] to-[#3B82F6] rounded-xl p-8 text-white shadow-lg">
         <h1 className="text-3xl font-bold mb-2">¡Bienvenido al Dashboard!</h1>
-        <p className="text-white/90">Sistema de Gestión Escolar - I.E. 3082 &quot;Paraíso Florida&quot;</p>
+        <p className="text-white/90">Sistema de Gestión Escolar - I.E. 3082 &quot;Paraíso Florido&quot;</p>
       </div>
 
       {/* Stats Grid */}

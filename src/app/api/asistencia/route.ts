@@ -59,7 +59,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Error al actualizar hora de salida' }, { status: 500 })
       }
 
-      return NextResponse.json({ message: 'Salida registrada', data })
+  return NextResponse.json({ message: 'Salida registrada', data, actionType: 'salida' })
     }
 
     // Si no existe -> primer marcaje (entrada)
@@ -94,7 +94,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: error.message || 'Error al registrar asistencia' }, { status: 500 })
     }
 
-    return NextResponse.json({ message: 'Entrada registrada', data })
+  return NextResponse.json({ message: 'Entrada registrada', data, actionType: 'entrada' })
   } catch (err) {
     console.error('Error registrando asistencia:', err)
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })

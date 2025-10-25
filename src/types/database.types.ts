@@ -22,10 +22,11 @@ export interface Usuario {
   gradoId?: number | null
   seccionId?: number | null
   rolId?: number | null
+  created_at: string
   grado?: Grado
   seccion?: Seccion
   rol?: Rol
-}
+}  
 
 export type EstadoAsistencia = 'ASISTENCIA' | 'TARDANZA' | 'FALTA'
 
@@ -36,12 +37,16 @@ export interface Asistencia {
   hora_llegada?: string | null // HH:mm:ss
   hora_salida?: string | null
   estado: EstadoAsistencia
+  presente: boolean
+  tipo?: string | null
+  observaciones?: string | null
   usuarios?: Usuario
 }
 
 export interface InfoContacto {
   id: number
-  usuarioId: string
+  nombre: string
+  usuarioid: string
   correo?: string | null
   telefono?: string | null
   usuario?: Usuario

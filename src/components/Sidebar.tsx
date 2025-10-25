@@ -85,11 +85,6 @@ export default function Sidebar() {
               })}
             </ul>
           </nav>
-
-          {/* Footer del Sidebar */}
-          <div className="p-3 md:p-4 border-t border-white/10">
-            <p className="text-xs text-center text-white/60">Dashboard v1.0</p>
-          </div>
         </div>
       </div>
 
