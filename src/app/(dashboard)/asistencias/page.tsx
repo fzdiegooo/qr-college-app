@@ -4,6 +4,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { getAllAsistencias } from "@/services/asistenciaService";
+import { usuarioService } from "@/services/alumnosService";
+import { infoContactoService } from "@/services/infoContactoService";
 import { Asistencia } from "@/types/database.types";
 import { FaSearch } from "react-icons/fa";
 import { Temporal, toTemporalInstant } from "temporal-polyfill";
@@ -202,25 +204,25 @@ export default function AsistenciasPage() {
         setResult(data.message || "Asistencia registrada");
 
         // Obtener datos del usuario y contacto
-        const usuarioRes = await fetch(`/api/usuario/${usuarioId}`);
-        const usuario = await usuarioRes.json();
-        const contactoRes = await fetch(`/api/info-contacto/${usuarioId}`);
-        const contacto = await contactoRes.json();
+        const usuario = await usuarioService.getById(usuarioId);
+        const contacto = await infoContactoService.getByUsuarioId(usuarioId);
 
-        // Enviar correo al microservicio con el tipo correcto
-        await fetch("http://localhost:3100/api/send-school-attendance", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            to: contacto.correo,
-            templateId: 1,
-            parentName: contacto.nombre,
-            studentName: usuario.nombre,
-            grade: usuario.grado?.nombre || usuario.gradoNombre || "",
-            section: usuario.seccion?.nombre || usuario.seccionNombre || "",
-            actionType: data.actionType || "entrada"
-          })
-        });
+        // Enviar correo al microservicio con el tipo correcto (solo si hay contacto)
+        if (contacto?.correo) {
+          await fetch("http://localhost:3100/api/send-school-attendance", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              to: contacto.correo,
+              templateId: 1,
+              parentName: contacto.nombre,
+              studentName: usuario.nombre,
+              grade: (usuario.grado as any)?.nombre || "",
+              section: (usuario.seccion as any)?.nombre || "",
+              actionType: data.actionType || "entrada"
+            })
+          });
+        }
       } else {
         setError(data.error || "Error al registrar asistencia");
       }

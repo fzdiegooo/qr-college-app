@@ -17,6 +17,7 @@ import {
   FaTimes,
   FaPrint,
 } from "react-icons/fa";
+import { Temporal } from "temporal-polyfill";
 
 export default function AlumnoDetallePage() {
 
@@ -210,15 +211,17 @@ export default function AlumnoDetallePage() {
   };
 
   const formatFecha = (fecha: string) => {
-    return new Date(fecha).toLocaleDateString("es-ES", {
+    const plainDate = Temporal.PlainDate.from(fecha);
+    return plainDate.toLocaleString("es-ES", {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
     });
   };
 
-  const formatHora = (fecha: string) => {
-    return new Date(fecha).toLocaleTimeString("es-ES", {
+  const formatHora = (hora: string) => {
+    const plainTime = Temporal.PlainTime.from(hora);
+    return plainTime.toLocaleString("es-ES", {
       hour: "2-digit",
       minute: "2-digit",
     });
@@ -493,19 +496,17 @@ export default function AlumnoDetallePage() {
                 <div key={asistencia.id} className="p-4">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      {asistencia.presente ? (
-                        <FaCheckCircle className="text-green-500" />
-                      ) : (
-                        <FaTimesCircle className="text-red-500" />
-                      )}
+                      <FaCheckCircle className="text-green-500" />
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          asistencia.presente
+                          asistencia.estado === 'ASISTENCIA'
                             ? "bg-green-100 text-green-700"
+                            : asistencia.estado === 'TARDANZA'
+                            ? "bg-yellow-100 text-yellow-700"
                             : "bg-red-100 text-red-700"
                         }`}
                       >
-                        {asistencia.presente ? "Presente" : "Ausente"}
+                        {asistencia.estado}
                       </span>
                     </div>
                     <span className="text-sm text-gray-500">
@@ -514,26 +515,18 @@ export default function AlumnoDetallePage() {
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
-                      <span className="text-gray-500">Hora:</span>
+                      <span className="text-gray-500">Llegada:</span>
                       <span className="ml-2 text-gray-900">
-                        {formatHora(asistencia.fecha)}
+                        {asistencia.hora_llegada || "—"}
                       </span>
                     </div>
                     <div>
-                      <span className="text-gray-500">Tipo:</span>
-                      <span className="ml-2 text-gray-900 capitalize">
-                        {asistencia.tipo || "Manual"}
+                      <span className="text-gray-500">Salida:</span>
+                      <span className="ml-2 text-gray-900">
+                        {asistencia.hora_salida || "—"}
                       </span>
                     </div>
                   </div>
-                  {asistencia.observaciones && (
-                    <div className="mt-3 p-2 bg-gray-50 rounded text-sm">
-                      <span className="text-gray-500">Observaciones:</span>
-                      <span className="ml-2 text-gray-900">
-                        {asistencia.observaciones}
-                      </span>
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
@@ -550,13 +543,10 @@ export default function AlumnoDetallePage() {
                       Fecha
                     </th>
                     <th className="px-6 py-3 text-left text-sm font-semibold">
-                      Hora
+                      Hora Llegada
                     </th>
                     <th className="px-6 py-3 text-left text-sm font-semibold">
-                      Tipo
-                    </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold">
-                      Observaciones
+                      Hora Salida
                     </th>
                   </tr>
                 </thead>
@@ -565,19 +555,17 @@ export default function AlumnoDetallePage() {
                     <tr key={asistencia.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          {asistencia.presente ? (
-                            <FaCheckCircle className="text-green-500" />
-                          ) : (
-                            <FaTimesCircle className="text-red-500" />
-                          )}
+                          <FaCheckCircle className="text-green-500" />
                           <span
                             className={`px-3 py-1 rounded-full text-sm font-medium ${
-                              asistencia.presente
+                              asistencia.estado === 'ASISTENCIA'
                                 ? "bg-green-100 text-green-700"
+                                : asistencia.estado === 'TARDANZA'
+                                ? "bg-red-100 text-yellow-700"
                                 : "bg-red-100 text-red-700"
                             }`}
                           >
-                            {asistencia.presente ? "Presente" : "Ausente"}
+                            {asistencia.estado}
                           </span>
                         </div>
                       </td>
@@ -590,14 +578,14 @@ export default function AlumnoDetallePage() {
                       <td className="px-6 py-4 text-gray-900">
                         <div className="flex items-center gap-2">
                           <FaClock className="text-gray-400 text-sm" />
-                          {formatHora(asistencia.fecha)}
+                          {asistencia.hora_llegada || "—"}
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-gray-600 capitalize">
-                        {asistencia.tipo || "Manual"}
-                      </td>
-                      <td className="px-6 py-4 text-gray-600">
-                        {asistencia.observaciones || "—"}
+                      <td className="px-6 py-4 text-gray-900">
+                        <div className="flex items-center gap-2">
+                          <FaClock className="text-gray-400 text-sm" />
+                          {asistencia.hora_salida || "—"}
+                        </div>
                       </td>
                     </tr>
                   ))}
