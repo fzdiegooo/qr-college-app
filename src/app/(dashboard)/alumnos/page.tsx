@@ -176,9 +176,6 @@ export default function AlumnosPage() {
             >
               <FaFilter className="text-xs" /> Filtros
             </button>
-            <button className="h-9 px-5 rounded-md bg-blue-600 text-white text-sm flex items-center gap-2 hover:bg-blue-700 transition-colors">
-              <FaPlus className="text-xs" /> Nuevo Alumno
-            </button>
           </div>
         </div>
       </div>
@@ -445,12 +442,6 @@ export default function AlumnosPage() {
                             title="Ver"
                           >
                             <FaEye className="text-xs" />
-                          </button>
-                          <button
-                            className="p-1.5 rounded-md text-yellow-600 hover:bg-yellow-50 transition-colors"
-                            title="Editar"
-                          >
-                            <FaEdit className="text-xs" />
                           </button>
                           <button
                             className="p-1.5 rounded-md text-red-600 hover:bg-red-50 transition-colors"
