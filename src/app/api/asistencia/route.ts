@@ -11,11 +11,27 @@ function compararHoras(h1: string, h2: string): number {
   return Temporal.PlainTime.compare(t1, t2);
 }
 
+
 export async function POST(req: Request) {
   try {
-    const { usuarioId } = await req.json()
-    if (!usuarioId) {
-      return NextResponse.json({ error: 'usuarioId es requerido' }, { status: 400 })
+    const { usuarioId, documento } = await req.json();
+    let userId = usuarioId;
+
+    // Si viene documento (DNI), buscar el usuario por documento
+    if (!userId && documento) {
+      const { data: usuario, error: usuarioError } = await supabase
+        .from('usuarios')
+        .select('id')
+        .eq('documento', documento)
+        .maybeSingle();
+      if (usuarioError || !usuario) {
+        return NextResponse.json({ error: 'No se encontró usuario con ese documento' }, { status: 404 });
+      }
+      userId = usuario.id;
+    }
+
+    if (!userId) {
+      return NextResponse.json({ error: 'usuarioId o documento es requerido' }, { status: 400 });
     }
 
   // Obtener fecha y hora actual en Lima

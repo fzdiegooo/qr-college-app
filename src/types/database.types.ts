@@ -19,20 +19,20 @@ export interface Usuario {
   documento: string
   sexo: 'M' | 'F'
   edad: number
-  gradoId?: number | null
-  seccionId?: number | null
+  gradoid?: number | null
+  seccionid?: number | null
   rolId?: number | null
-  created_at: string
+  created_at?: string
   grado?: Grado
   seccion?: Seccion
   rol?: Rol
-}  
+}
 
 export type EstadoAsistencia = 'ASISTENCIA' | 'TARDANZA' | 'FALTA'
 
 export interface Asistencia {
   id: number
-  usuarioId: string
+  usuarioid: string
   fecha: string // ISO date
   hora_llegada?: string | null // HH:mm:ss
   hora_salida?: string | null
@@ -71,3 +71,31 @@ export interface PaginatedResponse<T> {
   data: T[]
   count: number
 }
+
+// Bulk upload types
+export interface BulkStudentData {
+  nombres: string
+  apellidos: string
+  nro_documento: string
+  sexo: 'M' | 'F'
+  edad: number
+  grado: number
+  seccion: string
+  nombre_contacto: string
+  correo_contacto?: string
+  telefono_contacto?: string
+}
+
+export interface BulkCreateResponse {
+  created: number
+  skipped: number
+  failed: number
+  errors: Array<{
+    row: number
+    documento: string
+    error: string
+  }>
+  createdStudents: Array<{ id: string; nombre: string }>
+  skippedStudents: Array<{ documento: string; nombre: string }>
+}
+

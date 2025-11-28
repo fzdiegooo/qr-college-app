@@ -13,7 +13,9 @@ import {
   FaEye,
   FaFilter,
   FaTimes,
+  FaFileUpload,
 } from "react-icons/fa";
+import BulkUploadModal from "@/components/BulkUploadModal";
 
 export default function AlumnosPage() {
   const router = useRouter();
@@ -24,6 +26,18 @@ export default function AlumnosPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filtros, setFiltros] = useState<any>({});
   const [showFilters, setShowFilters] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
+  // Estado para formulario de creación
+  const [nuevoNombre, setNuevoNombre] = useState("");
+  const [nuevoDocumento, setNuevoDocumento] = useState("");
+  const [nuevoEdad, setNuevoEdad] = useState("");
+  const [nuevoSexo, setNuevoSexo] = useState("M");
+  const [nuevoGrado, setNuevoGrado] = useState("");
+  const [nuevoSeccion, setNuevoSeccion] = useState("");
+  const [nuevoError, setNuevoError] = useState("");
+  const [nuevoSuccess, setNuevoSuccess] = useState("");
+  const [loadingCrear, setLoadingCrear] = useState(false);
   const dense = true;
 
   // Paginación
@@ -145,7 +159,10 @@ export default function AlumnosPage() {
               >
                 <FaFilter className="text-xs" /> Filtros
               </button>
-              <button className="h-9 px-3 rounded-md bg-blue-600 text-white text-sm flex items-center gap-1 hover:bg-blue-700 transition-colors">
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="h-9 px-3 rounded-md bg-blue-600 text-white text-sm flex items-center gap-1 hover:bg-blue-700 transition-colors"
+              >
                 <FaPlus className="text-xs" />
               </button>
             </div>
@@ -176,9 +193,147 @@ export default function AlumnosPage() {
             >
               <FaFilter className="text-xs" /> Filtros
             </button>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="h-9 px-4 rounded-md bg-blue-600 text-white text-sm flex items-center gap-2 hover:bg-blue-700 transition-colors"
+            >
+              <FaPlus className="text-xs" /> Nuevo Alumno
+            </button>
+            <button
+              onClick={() => setShowBulkUploadModal(true)}
+              className="h-9 px-4 rounded-md bg-purple-600 text-white text-sm flex items-center gap-2 hover:bg-purple-700 transition-colors"
+            >
+              <FaFileUpload className="text-xs" /> Matrícula Masiva
+            </button>
           </div>
         </div>
       </div>
+      {/* Modal para crear nuevo alumno */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4">
+            <div className="flex items-center justify-between p-6 border-b">
+              <h3 className="text-lg font-semibold text-gray-800">Crear nuevo alumno</h3>
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className="p-1 rounded-md hover:bg-gray-100"
+              >
+                <FaTimes className="text-gray-500" />
+              </button>
+            </div>
+            <form
+              className="p-6 space-y-4"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setNuevoError("");
+                setNuevoSuccess("");
+                setLoadingCrear(true);
+                try {
+                  const nuevo = await usuarioService.create({
+                    nombre: nuevoNombre,
+                    documento: nuevoDocumento,
+                    edad: Number(nuevoEdad),
+                    sexo: nuevoSexo === 'M' ? 'M' : 'F',
+                    gradoid: nuevoGrado ? Number(nuevoGrado) : null,
+                    seccionid: nuevoSeccion ? Number(nuevoSeccion) : null,
+                  });
+                  setNuevoSuccess("Alumno creado correctamente");
+                  setNuevoNombre("");
+                  setNuevoDocumento("");
+                  setNuevoEdad("");
+                  setNuevoSexo("M");
+                  setNuevoGrado("");
+                  setNuevoSeccion("");
+                  setShowCreateModal(false);
+                  await loadAlumnos();
+                } catch (err) {
+                  setNuevoError("Error al crear alumno");
+                } finally {
+                  setLoadingCrear(false);
+                }
+              }}
+            >
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">Nombre Completo</label>
+                <input
+                  type="text"
+                  className="w-full rounded border px-3 py-2"
+                  value={nuevoNombre}
+                  onChange={e => setNuevoNombre(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">Documento (DNI)</label>
+                <input
+                  type="text"
+                  className="w-full rounded border px-3 py-2"
+                  value={nuevoDocumento}
+                  onChange={e => setNuevoDocumento(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">Edad</label>
+                <input
+                  type="number"
+                  className="w-full rounded border px-3 py-2"
+                  value={nuevoEdad}
+                  onChange={e => setNuevoEdad(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">Sexo</label>
+                <select
+                  className="w-full rounded border px-3 py-2"
+                  value={nuevoSexo}
+                  onChange={e => setNuevoSexo(e.target.value)}
+                  required
+                >
+                  <option value="M">Masculino</option>
+                  <option value="F">Femenino</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">Grado</label>
+                <select
+                  className="w-full rounded border px-3 py-2"
+                  value={nuevoGrado}
+                  onChange={e => setNuevoGrado(e.target.value)}
+                >
+                  <option value="">Sin asignar</option>
+                  {grados.map((g) => (
+                    <option key={g.id} value={g.id}>{g.nombre}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">Sección</label>
+                <select
+                  className="w-full rounded border px-3 py-2"
+                  value={nuevoSeccion}
+                  onChange={e => setNuevoSeccion(e.target.value)}
+                >
+                  <option value="">Sin asignar</option>
+                  {secciones.map((s) => (
+                    <option key={s.id} value={s.id}>{s.nombre}</option>
+                  ))}
+                </select>
+              </div>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-blue-600 text-white rounded w-full"
+                disabled={loadingCrear}
+              >
+                {loadingCrear ? "Creando..." : "Crear alumno"}
+              </button>
+              {nuevoSuccess && <p className="text-green-600 text-sm mt-2">{nuevoSuccess}</p>}
+              {nuevoError && <p className="text-red-600 text-sm mt-2">{nuevoError}</p>}
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Drawer lateral de filtros */}
       {showFilters && (
@@ -535,6 +690,19 @@ export default function AlumnosPage() {
           </div>
         </div>
       </div>
+
+      {/* Bulk Upload Modal */}
+      <BulkUploadModal
+        isOpen={showBulkUploadModal}
+        onClose={() => {
+          setShowBulkUploadModal(false);
+          window.location.reload();
+        }}
+        onSuccess={() => {
+          setShowBulkUploadModal(false);
+          window.location.reload();
+        }}
+      />
     </div>
   );
 }

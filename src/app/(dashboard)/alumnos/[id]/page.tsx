@@ -29,6 +29,7 @@ export default function AlumnoDetallePage() {
   const [editError, setEditError] = useState("");
   const [editCorreo, setEditCorreo] = useState("");
   const [editTelefono, setEditTelefono] = useState("");
+  const [editContactoNombre, setEditContactoNombre] = useState("");
   const [editContactoSuccess, setEditContactoSuccess] = useState("");
   const [editContactoError, setEditContactoError] = useState("");
 
@@ -42,6 +43,7 @@ export default function AlumnoDetallePage() {
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
+    setEditContactoNombre(infoContacto?.nombre || "");
     setEditCorreo(infoContacto?.correo || "");
     setEditTelefono(infoContacto?.telefono || "");
   }, [infoContacto]);
@@ -128,7 +130,7 @@ export default function AlumnoDetallePage() {
     if (!alumno || !qrCanvasRef.current) return;
 
     try {
-      await QRCode.toCanvas(qrCanvasRef.current, alumno.id, {
+      await QRCode.toCanvas(qrCanvasRef.current, alumno.documento, {
         width: 200,
         margin: 2,
         color: {
@@ -333,6 +335,7 @@ export default function AlumnoDetallePage() {
                     // Editar info de contacto
                     try {
                       const contacto = await infoContactoService.update(infoContacto.id, {
+                        nombre: editContactoNombre,
                         correo: editCorreo,
                         telefono: editTelefono,
                       });
@@ -343,6 +346,15 @@ export default function AlumnoDetallePage() {
                     }
                   }}
                 >
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Nombre del contacto</label>
+                    <input
+                      type="text"
+                      className="w-full rounded border px-3 py-2"
+                      value={editContactoNombre}
+                      onChange={(e) => setEditContactoNombre(e.target.value)}
+                    />
+                  </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-1">Correo electrónico</label>
                     <input
@@ -374,7 +386,7 @@ export default function AlumnoDetallePage() {
                     try {
                       const contacto = await infoContactoService.create({
                         usuarioid: alumno.id,
-                        nombre: alumno.nombre,
+                        nombre: editContactoNombre,
                         correo: editCorreo,
                         telefono: editTelefono,
                       });
@@ -385,6 +397,15 @@ export default function AlumnoDetallePage() {
                     }
                   }}
                 >
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Nombre del contacto</label>
+                    <input
+                      type="text"
+                      className="w-full rounded border px-3 py-2"
+                      value={editContactoNombre}
+                      onChange={(e) => setEditContactoNombre(e.target.value)}
+                    />
+                  </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-1">Correo electrónico</label>
                     <input

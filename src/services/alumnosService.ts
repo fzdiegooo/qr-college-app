@@ -89,5 +89,21 @@ export const usuarioService = {
     const { error } = await supabase.from(TABLE).delete().eq('id', id)
     if (error) throw error
     return true
+  },
+
+  async createBulk(students: any[]): Promise<any> {
+    const response = await fetch('/api/alumnos/bulk', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ alumnos: students }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al crear alumnos en masa');
+    }
+
+    return response.json();
   }
 }

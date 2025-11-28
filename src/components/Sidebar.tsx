@@ -3,24 +3,28 @@ import { FaBars, FaTimes, FaHome, FaUserGraduate, FaClipboardCheck, FaChartBar, 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../contexts/SidebarContext";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Sidebar() {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
+  const { role } = useAuth();
   const pathname = usePathname();
 
-  const menuItems = [
-    { href: "/", label: "Inicio", icon: FaHome },
-    { href: "/alumnos", label: "Alumnos", icon: FaUserGraduate },
-    { href: "/asistencias", label: "Asistencia", icon: FaClipboardCheck },
-    { href: "/reportes", label: "Reportes", icon: FaChartBar },
-    { href: "/configuracion", label: "Configuración", icon: FaCog },
+  const allMenuItems = [
+    { href: "/", label: "Inicio", icon: FaHome, roles: ["ADMIN"] },
+    { href: "/alumnos", label: "Alumnos", icon: FaUserGraduate, roles: ["ADMIN"] },
+    { href: "/asistencias", label: "Asistencia", icon: FaClipboardCheck, roles: ["ADMIN", "PORTERO"] },
+    { href: "/reportes", label: "Reportes", icon: FaChartBar, roles: ["ADMIN"] },
+    { href: "/configuracion", label: "Configuración", icon: FaCog, roles: ["ADMIN"] },
   ];
 
-  // Función para cerrar sidebar en móvil al navegar
+  const menuItems = allMenuItems.filter((item) => item.roles.includes(role!));
+
   const handleLinkClick = () => {
-    if (typeof window !== 'undefined' && window.innerWidth < 768) {
-      toggleSidebar();
-    }
+    // Close sidebar on mobile when a link is clicked
+    // if (isSidebarOpen) {
+    //   toggleSidebar();
+    // }
   };
 
   return (
