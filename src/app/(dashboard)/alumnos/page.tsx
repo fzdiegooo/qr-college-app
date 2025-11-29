@@ -4,6 +4,7 @@ import { getSecciones } from "@/services/seccionService";
 import { Usuario, Grado, Seccion } from "@/types/database.types";
 import { usuarioService } from "@/services/alumnosService";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import {
   FaSearch,
@@ -19,6 +20,7 @@ import BulkUploadModal from "@/components/BulkUploadModal";
 
 export default function AlumnosPage() {
   const router = useRouter();
+  const { loading: authLoading, user, role } = useAuth();
   const [alumnos, setAlumnos] = useState<Usuario[]>([]);
   const [grados, setGrados] = useState<Grado[]>([]);
   const [secciones, setSecciones] = useState<Seccion[]>([]);
@@ -45,13 +47,16 @@ export default function AlumnosPage() {
   const PAGE_SIZE = 15;
   const [totalAlumnos, setTotalAlumnos] = useState(0);
 
+  // Solo cargar datos cuando el contexto esté listo y el usuario esté definido
   useEffect(() => {
+    if (authLoading || !user) return;
     loadData();
-  }, []);
+  }, [authLoading, user]);
 
   useEffect(() => {
+    if (authLoading || !user) return;
     loadAlumnos();
-  }, [currentPage, filtros]);
+  }, [authLoading, user, currentPage, filtros]);
 
   const loadData = async () => {
     try {
@@ -118,6 +123,13 @@ export default function AlumnosPage() {
   };
 
   const totalPages = Math.ceil(totalAlumnos / PAGE_SIZE);
+
+  if (authLoading) {
+    return <div className="p-8 text-center text-gray-500">Cargando autenticación...</div>;
+  }
+  if (!user) {
+    return <div className="p-8 text-center text-gray-500">No autenticado</div>;
+  }
 
   return (
     <div className="space-y-4 md:space-y-6">
@@ -706,3 +718,4 @@ export default function AlumnosPage() {
     </div>
   );
 }
+

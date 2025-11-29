@@ -2,6 +2,7 @@
 
 
 import { useEffect, useRef, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { Html5Qrcode } from "html5-qrcode";
 import { getAllAsistencias } from "@/services/asistenciaService";
 import { usuarioService } from "@/services/alumnosService";
@@ -12,8 +13,18 @@ import { Temporal, toTemporalInstant } from "temporal-polyfill";
 
 
 export default function AsistenciasPage() {
+  const { role, loading: authLoading } = useAuth();
   // Tabs
-  const [tab, setTab] = useState<'registros' | 'registrar'>('registros');
+  // Si es PORTERO, solo mostrar 'registrar'
+  const isPortero = role === 'PORTERO';
+  const [tab, setTab] = useState<'registros' | 'registrar'>(isPortero ? 'registrar' : 'registros');
+
+  // Si el rol cambia a PORTERO en caliente, forzar tab a 'registrar'
+  useEffect(() => {
+    if (isPortero && tab !== 'registrar') {
+      setTab('registrar');
+    }
+  }, [isPortero, tab]);
 
   // Para escaneo QR
   const [scanning, setScanning] = useState(false);
@@ -190,7 +201,8 @@ export default function AsistenciasPage() {
 
     try {
       // Se espera que el QR contenga el id del usuario
-      const usuarioId = decodedText.trim();
+      const documento = decodedText.trim();
+      const usuarioId = (await usuarioService.getByDocumento(documento)).id;
       // Registrar asistencia
       const res = await fetch("/api/asistencia", {
         method: "POST",
@@ -286,26 +298,41 @@ export default function AsistenciasPage() {
     ? asistencias.filter(a => a.usuarios?.nombre?.toLowerCase().includes(search.trim().toLowerCase()))
     : asistencias;
 
+  if (authLoading) {
+    return <div className="p-8 text-center text-gray-500">Cargando autenticación...</div>;
+  }
+
   return (
     <div className="mx-auto space-y-4 md:space-y-6">
       {/* Tabs */}
       <div className="flex gap-1 md:gap-2 mb-4 md:mb-6 overflow-x-auto">
-        <button
-          className={`px-3 md:px-5 py-2 rounded-t-md font-semibold border-b-2 transition-colors text-sm md:text-base whitespace-nowrap ${tab === 'registros' ? 'border-[#8B1A1A] text-[#8B1A1A] bg-white' : 'border-transparent text-gray-500 bg-gray-100 hover:bg-gray-200'}`}
-          onClick={() => setTab('registros')}
-        >
-          Registros
-        </button>
-        <button
-          className={`px-3 md:px-5 py-2 rounded-t-md font-semibold border-b-2 transition-colors text-sm md:text-base whitespace-nowrap ${tab === 'registrar' ? 'border-[#8B1A1A] text-[#8B1A1A] bg-white' : 'border-transparent text-gray-500 bg-gray-100 hover:bg-gray-200'}`}
-          onClick={() => setTab('registrar')}
-        >
-          Registrar asistencia
-        </button>
+        {isPortero ? (
+          <button
+            className={`px-3 md:px-5 py-2 rounded-t-md font-semibold border-b-2 transition-colors text-sm md:text-base whitespace-nowrap ${'border-[#8B1A1A] text-[#8B1A1A] bg-white'}`}
+            disabled
+          >
+            Registrar asistencia
+          </button>
+        ) : (
+          <>
+            <button
+              className={`px-3 md:px-5 py-2 rounded-t-md font-semibold border-b-2 transition-colors text-sm md:text-base whitespace-nowrap ${tab === 'registros' ? 'border-[#8B1A1A] text-[#8B1A1A] bg-white' : 'border-transparent text-gray-500 bg-gray-100 hover:bg-gray-200'}`}
+              onClick={() => setTab('registros')}
+            >
+              Registros
+            </button>
+            <button
+              className={`px-3 md:px-5 py-2 rounded-t-md font-semibold border-b-2 transition-colors text-sm md:text-base whitespace-nowrap ${tab === 'registrar' ? 'border-[#8B1A1A] text-[#8B1A1A] bg-white' : 'border-transparent text-gray-500 bg-gray-100 hover:bg-gray-200'}`}
+              onClick={() => setTab('registrar')}
+            >
+              Registrar asistencia
+            </button>
+          </>
+        )}
       </div>
 
       {/* Contenido de cada tab */}
-      {tab === 'registros' && (
+      {(!isPortero && tab === 'registros') && (
         <div className="bg-white rounded-xl shadow-md p-3 md:p-6 text-left">
           <div className="flex flex-col gap-3 mb-4">
             <div className="font-semibold text-lg text-gray-800">Registros</div>
@@ -450,7 +477,7 @@ export default function AsistenciasPage() {
         </div>
       )}
 
-      {tab === 'registrar' && (
+      {(isPortero || tab === 'registrar') && (
         <div className="bg-white rounded-xl shadow-md p-4 md:p-6">
           <div className="max-w-md mx-auto text-center">
             <h2 className="text-lg md:text-xl font-bold mb-2">Registro de Asistencias</h2>

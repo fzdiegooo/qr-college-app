@@ -34,13 +34,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const supabase = createClient();
 
   useEffect(() => {
+    let lastUserId: string | null = null;
     const initializeAuth = async () => {
       try {
         // 1. Get current session
         const { data: { session } } = await supabase.auth.getSession();
-        
         if (session?.user) {
           setUser(session.user);
+          lastUserId = session.user.id;
           await fetchUsuarioData(session.user.id);
         } else {
           setLoading(false);
@@ -50,15 +51,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
           if (session?.user) {
             setUser(session.user);
-            // Only fetch if we don't have the user data or if the user changed
-            if (!usuario || usuario.id !== session.user.id) {
-               await fetchUsuarioData(session.user.id);
+            if (lastUserId !== session.user.id) {
+              lastUserId = session.user.id;
+              await fetchUsuarioData(session.user.id);
             }
           } else {
             setUser(null);
             setUsuario(null);
             setRole(null);
             setLoading(false);
+            lastUserId = null;
           }
         });
 
@@ -101,16 +103,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setRole(null);
     router.push("/login");
   };
-
-  useEffect(() => {
-    if (!loading && role === "PORTERO") {
-      const isAsistencias = pathname.startsWith("/asistencias");
-      
-      if (!isAsistencias) {
-        router.replace("/asistencias");
-      }
-    }
-  }, [loading, role, pathname, router]);
 
   return (
     <AuthContext.Provider value={{ user, usuario, role, loading, signOut }}>

@@ -105,5 +105,22 @@ export const usuarioService = {
     }
 
     return response.json();
+  },
+  
+  async getByDocumento(documento: string): Promise<Usuario> {
+    const { data, error } = await supabase
+      .from(TABLE)
+      .select(
+        `
+        *,
+        grado(nombre),
+        seccion(nombre),
+        rol(nombre)
+      `
+      )
+      .eq('documento', documento)
+      .single()
+    if (error) throw error
+    return data as Usuario
   }
 }
