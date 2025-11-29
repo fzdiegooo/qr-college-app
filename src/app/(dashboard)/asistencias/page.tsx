@@ -221,7 +221,7 @@ export default function AsistenciasPage() {
 
         // Enviar correo al microservicio con el tipo correcto (solo si hay contacto)
         if (contacto?.correo) {
-          await fetch("http://localhost:3100/api/send-school-attendance", {
+          await fetch("http://86.48.21.43:3100/api/send-school-attendance", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
